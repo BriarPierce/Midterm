@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=10, maximum-scale=15, user-scalable=yes" />
+    <title>Digitization Accuracy Study</title>
+    <style>
+        html, body, #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+        .addRecordBtn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 99;
+            background-color: #0079c1;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .esri-editor__header::before {
+            display: none;
+        }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
+    <script src="https://js.arcgis.com/4.26/"></script>
+    <script>
+        require([
+            "esri/config", "esri/WebMap", "esri/views/MapView", 
+            "esri/layers/FeatureLayer", "esri/widgets/Editor"
+        ], (esriConfig, WebMap, MapView, FeatureLayer, Editor) => {
+            esriConfig.apiKey = "AAPK0aee94b5d3fa4c61aef2f6d673b63373r6ZylQKkEbWdEmmxojG-k71cUosjAIB5Xe3c8UbDfw0HC6OxRxrargG4xciHm75i";
+
+            const map = new WebMap({
+                portalItem: { id: "c4796f14a73243e7bd1676d26818293c" }
+            });
+
+            const view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-83.5620885828886, 35.867246754815376], 
+                zoom: 15
+            });
+
+            const layer = new FeatureLayer({
+                url: "https://services5.arcgis.com/ZYK688A64hFRZ5yX/arcgis/rest/services/survey123_a8c8d941f2be4aaaaeacfdacba7bd147_form/FeatureServer/0",
+                renderer: {
+                    type: "unique-value",
+                    field: "Land Cover Code?",
+                    uniqueValueInfos: [1, 2, 3, 4, 5, 6].map((value, index) => ({
+                        value: value,
+                        label: ["1- Water", "2- Built-up", "3- Bare ground", "4- Forest", "5- Agriculture", "6- Grass"][index],
+                        symbol: {
+                            type: "simple-fill",
+                            color: [[1, 59, 249], [255, 0, 0], [204, 102, 0], [0, 102, 0], [0, 255, 0], [255, 255, 0]][index],
+                            outline: { color: [255, 255, 255], width: 1 }
+                        }
+                    }))
+                }
+            });
+
+            map.add(layer);
+
+            view.ui.add(new Editor({ view: view, layerInfos: [{ layer: layer }] }), "bottom-left");
+        });
+    </script>
+</head>
+<body>
+    <a href="https://survey123.arcgis.com/share/a8c8d941f2be4aaaaeacfdacba7bd147?portalUrl=https://ETSU.maps.arcgis.com" target="_blank" class="addRecordBtn">Survey123 Digitization Survey</a>
+    <div id="viewDiv"></div>
+</body>
+</html>
